@@ -12,9 +12,8 @@ pub use hashbrown::{HashMap, HashSet};
 
 pub mod hash_map {
     pub use hashbrown::hash_map::{
-        DefaultHashBuilder, Drain, Entry, IntoIter, IntoKeys, IntoValues, Iter, IterMut, Keys,
-        OccupiedEntry, OccupiedError, RawEntryBuilder, RawEntryBuilderMut, RawEntryMut,
-        RawOccupiedEntryMut, RawVacantEntryMut, VacantEntry, Values, ValuesMut,
+        Drain, Entry, IntoIter, IntoKeys, IntoValues, Iter, IterMut, Keys, OccupiedEntry,
+        OccupiedError, VacantEntry, Values, ValuesMut,
     };
     pub use hashbrown::HashMap;
 }
