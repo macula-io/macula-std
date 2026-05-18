@@ -167,6 +167,14 @@ pub trait Seek {
     fn seek(&mut self, pos: SeekFrom) -> Result<u64>;
 }
 
+/// Minimal `BufRead` shim, just enough for bytes' Reader wrapper. Real std
+/// implements `read_until` and friends on top; we ship only `fill_buf` +
+/// `consume` because nothing else is reached in the kernel build.
+pub trait BufRead: Read {
+    fn fill_buf(&mut self) -> Result<&[u8]>;
+    fn consume(&mut self, amt: usize);
+}
+
 /// In-memory `Cursor<T>` like `std::io::Cursor`, generic over any `T:
 /// AsRef<[u8]>`. Supports `Read`, `Seek`, and (when `T: AsMut<[u8]>`)
 /// `Write`. Position tracks bytes consumed; reads short-read at EOF.
