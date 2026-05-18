@@ -81,6 +81,12 @@ impl<'a, T: ?Sized> core::ops::DerefMut for MutexGuard<'a, T> {
     }
 }
 
+impl<'a, T: fmt::Debug + ?Sized> fmt::Debug for MutexGuard<'a, T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Debug::fmt(&**self, f)
+    }
+}
+
 impl<T: fmt::Debug + ?Sized> fmt::Debug for Mutex<T> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Mutex").finish_non_exhaustive()
@@ -150,6 +156,24 @@ impl<'a, T: ?Sized> core::ops::Deref for RwLockWriteGuard<'a, T> {
 impl<'a, T: ?Sized> core::ops::DerefMut for RwLockWriteGuard<'a, T> {
     fn deref_mut(&mut self) -> &mut T {
         &mut *self.inner
+    }
+}
+
+impl<'a, T: fmt::Debug + ?Sized> fmt::Debug for RwLockReadGuard<'a, T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Debug::fmt(&**self, f)
+    }
+}
+
+impl<'a, T: fmt::Debug + ?Sized> fmt::Debug for RwLockWriteGuard<'a, T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Debug::fmt(&**self, f)
+    }
+}
+
+impl<T: fmt::Debug + ?Sized> fmt::Debug for RwLock<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("RwLock").finish_non_exhaustive()
     }
 }
 

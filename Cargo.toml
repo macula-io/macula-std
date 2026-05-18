@@ -1,6 +1,6 @@
 [package]
 name = "macula-std"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Macula contributors"]
 description = "std shim crate for macula-kernel. Re-exports core+alloc under std namespaces; provides kernel-backed Instant/SystemTime/Mutex/HashMap/io."
