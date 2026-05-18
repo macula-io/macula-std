@@ -154,6 +154,21 @@ pub trait Write {
         }
         Ok(())
     }
+
+    /// Vectored write fallback. Real std offers a per-platform optimised
+    /// `writev`; we just iterate each `IoSlice` in turn. Downstream crates
+    /// that detect vectored support via this method get the same observable
+    /// behaviour, just without the kernel-call coalescing.
+    fn write_vectored(&mut self, bufs: &[IoSlice<'_>]) -> Result<usize> {
+        let mut total = 0;
+        for slice in bufs {
+            match self.write(slice.as_slice())? {
+                0 if !slice.as_slice().is_empty() => break,
+                n => total += n,
+            }
+        }
+        Ok(total)
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -295,6 +310,18 @@ impl<'a> core::ops::Deref for IoSliceMut<'a> {
 impl<'a> core::ops::DerefMut for IoSliceMut<'a> {
     fn deref_mut(&mut self) -> &mut [u8] {
         self.0
+    }
+}
+
+/// `Read` for `&[u8]`: consumes bytes from the front of the slice. Mirror
+/// of real std behaviour. Used by rustls's record-layer parsing.
+impl Read for &[u8] {
+    fn read(&mut self, buf: &mut [u8]) -> Result<usize> {
+        let n = self.len().min(buf.len());
+        let (head, tail) = self.split_at(n);
+        buf[..n].copy_from_slice(head);
+        *self = tail;
+        Ok(n)
     }
 }
 
