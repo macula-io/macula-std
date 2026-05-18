@@ -239,6 +239,57 @@ impl<T: AsRef<[u8]> + AsMut<[u8]>> Write for Cursor<T> {
     }
 }
 
+/// `IoSlice<'a>` mirrors `std::io::IoSlice` for vectored-I/O APIs. Our
+/// kernel does no real vectored I/O yet, but bytes / quinn-proto reference
+/// the type in trait signatures and need it to exist + impl `Deref<[u8]>`.
+#[derive(Copy, Clone, Debug)]
+#[repr(transparent)]
+pub struct IoSlice<'a>(&'a [u8]);
+
+impl<'a> IoSlice<'a> {
+    pub const fn new(buf: &'a [u8]) -> Self {
+        Self(buf)
+    }
+    pub fn advance(&mut self, n: usize) {
+        self.0 = &self.0[n..];
+    }
+    pub fn as_slice(&self) -> &[u8] {
+        self.0
+    }
+}
+
+impl<'a> core::ops::Deref for IoSlice<'a> {
+    type Target = [u8];
+    fn deref(&self) -> &[u8] {
+        self.0
+    }
+}
+
+/// `IoSliceMut<'a>` mirrors `std::io::IoSliceMut`. Same caveat: kernel does
+/// no real vectored I/O yet, but the type must exist for trait signatures.
+#[derive(Debug)]
+#[repr(transparent)]
+pub struct IoSliceMut<'a>(&'a mut [u8]);
+
+impl<'a> IoSliceMut<'a> {
+    pub fn new(buf: &'a mut [u8]) -> Self {
+        Self(buf)
+    }
+}
+
+impl<'a> core::ops::Deref for IoSliceMut<'a> {
+    type Target = [u8];
+    fn deref(&self) -> &[u8] {
+        self.0
+    }
+}
+
+impl<'a> core::ops::DerefMut for IoSliceMut<'a> {
+    fn deref_mut(&mut self) -> &mut [u8] {
+        self.0
+    }
+}
+
 impl Write for alloc::vec::Vec<u8> {
     fn write(&mut self, buf: &[u8]) -> Result<usize> {
         self.extend_from_slice(buf);

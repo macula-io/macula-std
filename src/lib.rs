@@ -92,6 +92,16 @@ pub mod error {
     pub use core::error::Error;
 }
 
+/// `std::process` shim. Only `abort()` is supplied; downstream crates use it
+/// in the same places they would call `panic!()` when running freestanding.
+pub mod process {
+    /// Abort the current execution. We translate to a panic so the kernel's
+    /// panic handler runs; there is no separate process boundary to abort.
+    pub fn abort() -> ! {
+        panic!("std::process::abort()");
+    }
+}
+
 /// Re-export `Cow` at `std::borrow::Cow` (alloc already places it there, but
 /// some crates spell it `std::borrow::Cow`).
 pub use alloc::borrow::{Cow, ToOwned};
