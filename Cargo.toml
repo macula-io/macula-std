@@ -5,7 +5,7 @@ edition = "2021"
 authors = ["Macula contributors"]
 description = "std shim crate for macula-kernel. Re-exports core+alloc under std namespaces; provides kernel-backed Instant/SystemTime/Mutex/HashMap/io."
 license = "MIT OR Apache-2.0"
-repository = "https://codeberg.org/macula-internal/macula-std"
+repository = "https://github.com/macula-io/macula-std"
 readme = "README.md"
 
 [dependencies]
